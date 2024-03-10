@@ -1,3 +1,4 @@
 subjects
 venv
 .idea
+__pycache__

@@ -12,5 +12,3 @@ def check(func) -> None:
 def subject_list() -> list[str]:
     return os.listdir(PATH)
 
-
-
