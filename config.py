@@ -17,7 +17,7 @@ PROGRAM_NAME = "taskcontrol-command"
 
 GLOBAL_NAME = "~"
 
-INPUT_ERROR_TEXT = "Команда не найдена. help для получения дополнительной информации"
+INPUT_ERROR = "Команда не найдена. help для получения дополнительной информации"
 
 ZERO_LIST_TEXT = "Вы ещё не создали ни одного предмета"
 
