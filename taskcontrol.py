@@ -4,10 +4,6 @@ from config import *
 current_subject = None
 
 
-def input_error() -> None:
-    print(INPUT_ERROR_TEXT)
-
-
 def _command_help() -> None:
     if not current_subject:
         print(GLOBAL_HELP_TEXT)
@@ -53,7 +49,7 @@ def main() -> None:
                 case "exit":
                     exit(0)
                 case _:
-                    input_error()
+                    print(INPUT_ERROR)
         else:  # local
             match commands[0]:
                 case "help":
@@ -61,7 +57,7 @@ def main() -> None:
                 case "exit":
                     current_subject = None
                 case _:
-                    input_error()
+                    print(INPUT_ERROR)
 
 
 if __name__ == "__main__":
