@@ -39,6 +39,14 @@ def _list_command() -> None:
     print(*subject_list(), sep="    ")
 
 
+def _fav_command(commands) -> None:
+    current_subject.add_to_fav(*list(map(int, commands[1:])))
+
+
+def _done_command(commands) -> None:
+    current_subject.add_to_done(*list(map(int, commands[1:])))
+
+
 def main() -> None:
     global current_subject
     while True:
@@ -64,6 +72,10 @@ def main() -> None:
             match commands[0]:
                 case "help":
                     _help_command()
+                case "done":
+                    _done_command(commands)
+                case "fav":
+                    _fav_command(commands)
                 case "exit":
                     current_subject = None
                 case _:
@@ -72,6 +84,6 @@ def main() -> None:
 
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) > 1: #
-        current_subject = sys.argv[1]
+    if len(sys.argv) > 1 and subject_exist(sys.argv[1]):
+        current_subject = Subject(sys.argv[1])
     main()
