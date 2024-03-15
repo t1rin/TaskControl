@@ -1,5 +1,6 @@
 from os.path import exists
 from os import mkdir, listdir
+from random import sample
 import json
 
 from json.decoder import JSONDecodeError
@@ -46,44 +47,44 @@ class Subject:
     def __init__(self, name) -> None:
         self.name: str = name
         self.quantity: int | None = None
-        self._favorite: list[int] | None = None
-        self._solved: list[int] | None = None
+        self.favorite: list[int] | None = None
+        self.solved: list[int] | None = None
 
         self._load_subject()
 
+    def rand_tasks(self, quantity: int) -> list[int]:
+        all_tasks = {i + 1 for i in range(self.quantity)}
+        return sample(list(all_tasks - set(self.solved)), quantity)
 
     def add_to_fav(self, *args) -> None:
-        self._favorite.extend(args)
-        self._favorite = list(set(self._favorite))
-        self._favorite = [n for n in self._favorite if n <= self.quantity]
+        self.favorite.extend(args)
+        self.favorite = list(set(self.favorite))
+        self.favorite = [n for n in self.favorite if n <= self.quantity]
         self.update()
-
 
     def add_to_done(self, *args) -> None:
-        self._solved.extend(args)
-        self._solved = list(set(self._solved))
-        self._solved = [n for n in self._solved if n <= self.quantity]
+        self.solved.extend(args)
+        self.solved = list(set(self.solved))
+        self.solved = [n for n in self.solved if n <= self.quantity]
         self.update()
-
 
     def update(self) -> None:
         dictionary = {
             "name": self.name,
             "quantity": self.quantity,
-            "favorite": self._favorite,
-            "solved": self._solved
+            "favorite": self.favorite,
+            "solved": self.solved
         }
         with open(PATH + "/" + self.name, "w", encoding="utf-8") as file:
-            file.write(json.dumps(dictionary, indent=2))
-
+            file.write(json.dumps(dictionary))
 
     def _load_subject(self) -> None:
         with open(PATH + "/" + self.name, "r", encoding="utf-8") as file:
             dictionary = json.loads(file.read())
             self.name = dictionary["name"]
             self.quantity = dictionary["quantity"]
-            self._favorite = dictionary["favorite"]
-            self._solved = dictionary["solved"]
+            self.favorite = dictionary["favorite"]
+            self.solved = dictionary["solved"]
 
 
 def create_subject(name: str, number_of_tasks: int) -> None:
@@ -94,4 +95,4 @@ def create_subject(name: str, number_of_tasks: int) -> None:
         "solved": []
     }
     with open(PATH + "/" + name, "w", encoding="utf-8") as file:
-        file.write(json.dumps(dictionary, indent=2))
+        file.write(json.dumps(dictionary))

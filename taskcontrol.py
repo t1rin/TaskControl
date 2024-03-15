@@ -11,7 +11,7 @@ def _help_command() -> None:
         print(LOCAL_HELP_TEXT)
 
 
-def _create_command(commands) -> None:
+def _create_command(commands: list[str]) -> None:
     if len(commands) < 3:
         print(NOT_ARGS_ERROR)
     else:
@@ -24,7 +24,7 @@ def _create_command(commands) -> None:
             print(ITEM_EXIST_ERROR)
 
 
-def _choice_command(commands) -> None:
+def _choice_command(commands: list[str]) -> None:
     if len(commands) < 2:
         print(NOT_ARGS_ERROR)
     else:
@@ -36,15 +36,37 @@ def _choice_command(commands) -> None:
 
 
 def _list_command() -> None:
-    print(*subject_list(), sep="    ")
+    print(*subject_list(), sep=SEPARATOR)
 
 
-def _fav_command(commands) -> None:
-    current_subject.add_to_fav(*list(map(int, commands[1:])))
+def _fav_command(commands: list[str]) -> None:
+    current_subject.add_to_fav(*map(int, commands[1:]))
 
 
-def _done_command(commands) -> None:
-    current_subject.add_to_done(*list(map(int, commands[1:])))
+def _done_command(commands: list[str]) -> None:
+    current_subject.add_to_done(*map(int, commands[1:]))
+
+
+def _rand_command(commands: list[str]) -> None:
+    if len(commands) < 2:
+        print(NOT_ARGS_ERROR)
+    else:
+        try:
+            quantity = int(commands[1])
+            print(*map(str, current_subject.rand_tasks(quantity)), sep=SEPARATOR)
+        except ValueError:
+            print(ARGS_ERROR)
+
+
+def _info_command() -> None:
+    percent = len(current_subject.solved)/current_subject.quantity * 100
+    print(INFO.format(
+        current_subject.name,
+        len(current_subject.favorite),
+        len(current_subject.solved),
+        current_subject.quantity,
+        round(percent, 1)
+    ))
 
 
 def main() -> None:
@@ -76,6 +98,10 @@ def main() -> None:
                     _done_command(commands)
                 case "fav":
                     _fav_command(commands)
+                case "rand":
+                    _rand_command(commands)
+                case "info":
+                    _info_command()
                 case "exit":
                     current_subject = None
                 case _:
