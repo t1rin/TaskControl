@@ -1,6 +1,7 @@
 from os.path import exists
 from os import mkdir, listdir
 from random import sample
+from time import time
 import json
 
 from json.decoder import JSONDecodeError
@@ -48,13 +49,13 @@ class Subject:
         self.name: str = name
         self.quantity: int | None = None
         self.favorite: list[int] | None = None
-        self.solved: list[int] | None = None
+        self.solved: list[list[int]] | None = None
 
         self._load_subject()
 
     def rand_tasks(self, quantity: int) -> list[int]:
         all_tasks = {i + 1 for i in range(self.quantity)}
-        return sample(list(all_tasks - set(self.solved)), quantity)
+        return sample(list(all_tasks - set(...)), quantity)
 
     def add_to_fav(self, *args) -> None:
         self.favorite.extend(args)
@@ -63,9 +64,12 @@ class Subject:
         self.update()
 
     def add_to_done(self, *args) -> None:
-        self.solved.extend(args)
-        self.solved = list(set(self.solved))
-        self.solved = [n for n in self.solved if n <= self.quantity]
+        for arg in args:
+            solved = list(zip(*self.solved))[0] \
+                if self.solved \
+                else []
+            if arg not in solved and 0 < arg <= self.quantity:
+                self.solved.append([arg, int(time())])
         self.update()
 
     def update(self) -> None:
@@ -76,7 +80,7 @@ class Subject:
             "solved": self.solved
         }
         with open(PATH + "/" + self.name, "w", encoding="utf-8") as file:
-            file.write(json.dumps(dictionary))
+            file.write(json.dumps(dictionary, indent=2))
 
     def _load_subject(self) -> None:
         with open(PATH + "/" + self.name, "r", encoding="utf-8") as file:
@@ -95,4 +99,4 @@ def create_subject(name: str, number_of_tasks: int) -> None:
         "solved": []
     }
     with open(PATH + "/" + name, "w", encoding="utf-8") as file:
-        file.write(json.dumps(dictionary))
+        file.write(json.dumps(dictionary, indent=2))

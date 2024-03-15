@@ -40,11 +40,17 @@ def _list_command() -> None:
 
 
 def _fav_command(commands: list[str]) -> None:
-    current_subject.add_to_fav(*map(int, commands[1:]))
+    try:
+        current_subject.add_to_fav(*map(int, commands[1:]))
+    except ValueError:
+        print(ARGS_ERROR)
 
 
 def _done_command(commands: list[str]) -> None:
-    current_subject.add_to_done(*map(int, commands[1:]))
+    try:
+        current_subject.add_to_done(*map(int, commands[1:]))
+    except ValueError:
+        print(ARGS_ERROR)
 
 
 def _rand_command(commands: list[str]) -> None:
