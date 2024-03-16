@@ -1,6 +1,8 @@
 from subject import *
 from config import *
 
+import time
+
 current_subject: Subject | None = None
 
 
@@ -40,17 +42,25 @@ def _list_command() -> None:
 
 
 def _fav_command(commands: list[str]) -> None:
-    try:
-        current_subject.add_to_fav(*map(int, commands[1:]))
-    except ValueError:
-        print(ARGS_ERROR)
+    if len(commands) > 1:
+        try:
+            current_subject.add_to_fav(*map(int, commands[1:]))
+        except ValueError:
+            print(ARGS_ERROR)
+    else:
+        print(*current_subject.favorite, sep=SEPARATOR)
 
 
 def _done_command(commands: list[str]) -> None:
-    try:
-        current_subject.add_to_done(*map(int, commands[1:]))
-    except ValueError:
-        print(ARGS_ERROR)
+    if len(commands) > 1:
+        try:
+            current_subject.add_to_done(*map(int, commands[1:]))
+        except ValueError:
+            print(ARGS_ERROR)
+    else:
+        for number in current_subject.solved:
+            tm = time.strftime("%d-%m-%y %H:%M", time.localtime(number[1]))
+            print(f"[{tm}]{SEPARATOR}{number[0]}")
 
 
 def _rand_command(commands: list[str]) -> None:
