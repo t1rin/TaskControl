@@ -55,12 +55,20 @@ class Subject:
 
     def rand_tasks(self, quantity: int) -> list[int]:
         all_tasks = {i + 1 for i in range(self.quantity)}
-        return sample(list(all_tasks - set(...)), quantity)
+        if self.solved:
+            solved = list(zip(*self.solved))[0]
+        else:
+            solved = []
+        return sample(list(all_tasks - set(solved)), quantity)
 
     def add_to_fav(self, *args) -> None:
         self.favorite.extend(args)
         self.favorite = list(set(self.favorite))
         self.favorite = [n for n in self.favorite if n <= self.quantity]
+        self.update()
+
+    def del_fav(self, *args) -> None:
+        self.favorite = [x for x in self.favorite if x not in args]
         self.update()
 
     def add_to_done(self, *args) -> None:

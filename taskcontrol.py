@@ -51,6 +51,13 @@ def _fav_command(commands: list[str]) -> None:
         print(*current_subject.favorite, sep=SEPARATOR)
 
 
+def _del_fav_command(commands: list[str]) -> None:
+    try:
+        current_subject.del_fav(*map(int, commands[1:]))
+    except ValueError:
+        print(ARGS_ERROR)
+
+
 def _done_command(commands: list[str]) -> None:
     if len(commands) > 1:
         try:
@@ -59,7 +66,7 @@ def _done_command(commands: list[str]) -> None:
             print(ARGS_ERROR)
     else:
         for number in current_subject.solved:
-            tm = time.strftime("%d-%m-%y %H:%M", time.localtime(number[1]))
+            tm = time.strftime(TIME_FORMAT, time.localtime(number[1]))
             print(f"[{tm}]{SEPARATOR}{number[0]}")
 
 
@@ -74,15 +81,37 @@ def _rand_command(commands: list[str]) -> None:
             print(ARGS_ERROR)
 
 
-def _info_command() -> None:
-    percent = len(current_subject.solved)/current_subject.quantity * 100
-    print(INFO.format(
-        current_subject.name,
-        len(current_subject.favorite),
-        len(current_subject.solved),
-        current_subject.quantity,
-        round(percent, 1)
-    ))
+def _info_command(commands: list[str]) -> None:
+    if len(commands) < 2:
+        percent = len(current_subject.solved) / current_subject.quantity * 100
+        print(INFO.format(
+            current_subject.name,
+            len(current_subject.favorite),
+            len(current_subject.solved),
+            current_subject.quantity,
+            round(percent, 1)
+        ))
+    else:
+        try:
+            number = int(commands[1])
+            if 0 < number <= current_subject.quantity:
+                time_n = None
+                found = False
+                for num, tm in current_subject.solved:
+                    if num == number:
+                        found = True
+                        time_n = tm
+                        break
+                print(INFO_TASK.format(
+                    number,
+                    "+" if found else "-",
+                    "+" if number in current_subject.favorite else "-",
+                    "-" if not found else time.strftime(TIME_FORMAT, time.localtime(time_n))
+                ))
+            else:
+                raise ValueError
+        except ValueError:
+            print(ARGS_ERROR)
 
 
 def main() -> None:
@@ -114,10 +143,12 @@ def main() -> None:
                     _done_command(commands)
                 case "fav":
                     _fav_command(commands)
+                case "delfav":
+                    _del_fav_command(commands)
                 case "rand":
                     _rand_command(commands)
                 case "info":
-                    _info_command()
+                    _info_command(commands)
                 case "exit":
                     current_subject = None
                 case _:
@@ -126,6 +157,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     import sys
+
     if len(sys.argv) > 1 and subject_exist(sys.argv[1]):
         current_subject = Subject(sys.argv[1])
     main()
