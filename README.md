@@ -15,6 +15,14 @@ Further, in Russian >>
 python3 taskcontrol.py
 ```
 
+## Структура
+
+./<br>
+├── _taskcontrol.py_ - главный файл<br>
+├── _subject.py_ - файл для работы с предметами<br>
+├── _handler.py_ - файл для обработки выводимого текста<br>
+└── _config.py_ - файл конфигурации<br>
+
 ## Команды
 
 ### Глобальные
