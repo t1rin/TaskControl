@@ -1,17 +1,15 @@
-from os.path import exists
-from os import mkdir, listdir
 from random import sample
 from time import time
 import json
+import os
 
 from json.decoder import JSONDecodeError
 
-PATH = "subjects"
-
+PATH = os.path.dirname(os.path.realpath(__file__)) + "/subjects"
 
 def check(func) -> None:
-    if not exists(PATH):
-        mkdir(PATH)
+    if not os.path.exists(PATH):
+        os.mkdir(PATH)
     return func
 
 
@@ -35,7 +33,7 @@ def subject_exist(name: str) -> bool:
 
 @check
 def subject_list() -> list[str]:
-    files = listdir(PATH)
+    files = os.listdir(PATH)
     file_list = []
     for file in files:
         if subject_exist(file):
@@ -108,3 +106,7 @@ def create_subject(name: str, number_of_tasks: int) -> None:
     }
     with open(PATH + "/" + name, "w", encoding="utf-8") as file:
         file.write(json.dumps(dictionary, indent=2))
+
+
+def open_subject(name: str) -> Subject:
+    return Subject(name)

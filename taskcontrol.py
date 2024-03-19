@@ -2,9 +2,13 @@ from subject import *
 from handler import *
 from config import *
 
-import time
+from time import strftime, localtime
+from threading import Thread
+from os.path import abspath
+import os
 
 current_subject: Subject | None = None
+is_running: bool = False
 
 
 def _help_command() -> None:
@@ -33,7 +37,7 @@ def _choice_command(commands: list[str]) -> None:
     else:
         if subject_exist(commands[1]):
             global current_subject
-            current_subject = Subject(commands[1])
+            current_subject = open_subject(commands[1])
         else:
             show(NOT_FOUND_ERROR)
 
@@ -67,7 +71,7 @@ def _done_command(commands: list[str]) -> None:
             show(ARGS_ERROR)
     else:
         for number in current_subject.solved:
-            tm = time.strftime(TIME_FORMAT, time.localtime(number[1]))
+            tm = strftime(TIME_FORMAT_D, localtime(number[1]))
             show(f"[{tm}]{SEPARATOR}{number[0]}")
 
 
@@ -107,12 +111,31 @@ def _info_command(commands: list[str]) -> None:
                     number,
                     YES if found else NO,
                     YES if number in current_subject.favorite else NO,
-                    NO if not found else time.strftime(TIME_FORMAT, time.localtime(time_n))
+                    NO if not found else strftime(TIME_FORMAT_D, localtime(time_n))
                 ))
             else:
                 raise ValueError
         except ValueError:
             show(ARGS_ERROR)
+
+
+def _gogo_command() -> None:
+    global is_running
+    if is_running:
+        show(ALREADY_RUN_ERROR)
+        return
+
+    def run_cmd(cmd: str, file_name: str) -> None:
+        global is_running
+        is_running = True
+        os.system(cmd + " " + file_name)
+        is_running = False
+
+    root_path = abspath(os.path.dirname(os.path.realpath(__file__)) + "/../") + "/"
+    if not os.path.isdir(root_path + current_subject.name):
+        os.mkdir(root_path + current_subject.name)
+    name = root_path + current_subject.name + "/" + strftime(TIME_FORMAT_F, localtime())
+    Thread(target=run_cmd, kwargs=dict(cmd=COMMAND, file_name=name)).start()
 
 
 def main() -> None:
@@ -152,6 +175,8 @@ def main() -> None:
                     _rand_command(commands)
                 case "info":
                     _info_command(commands)
+                case "gogo":
+                    _gogo_command()
                 case "exit":
                     current_subject = None
                 case _:
@@ -162,5 +187,5 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) > 1 and subject_exist(sys.argv[1]):
-        current_subject = Subject(sys.argv[1])
+        current_subject = open_subject(sys.argv[1])
     main()
