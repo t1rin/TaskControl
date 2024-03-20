@@ -44,8 +44,9 @@ def subject_list() -> list[str]:
 
 class Subject:
     """ Класс уже созданных предметов """
-    def __init__(self, name) -> None:
-        self.name: str = name
+    def __init__(self, file_name) -> None:
+        self.file_name = file_name
+        self.name: str | None = None
         self.quantity: int | None = None
         self.time: int | None = None
         self.favorite: list[int] | None = None
@@ -62,6 +63,14 @@ class Subject:
         else:
             solved = []
         return sample(list(all_tasks - set(solved)), quantity)
+
+    def rename(self, name: str, is_public: bool) -> None:
+        if is_public:
+            self.name = name
+            self.update()
+        else:
+            os.rename(PATH + "/" + self.file_name, PATH + "/" + name)
+            self.file_name = name
 
     def add_to_fav(self, *args) -> None:
         self.favorite.extend(args)
@@ -92,11 +101,11 @@ class Subject:
             "favorite": self.favorite,
             "solved": self.solved
         }
-        with open(PATH + "/" + self.name, "w", encoding="utf-8") as file:
+        with open(PATH + "/" + self.file_name, "w", encoding="utf-8") as file:
             file.write(json.dumps(dictionary, indent=2))
 
     def _load_subject(self) -> None:
-        with open(PATH + "/" + self.name, "r", encoding="utf-8") as file:
+        with open(PATH + "/" + self.file_name, "r", encoding="utf-8") as file:
             dictionary = json.loads(file.read())
             self.name = dictionary["name"]
             self.quantity = dictionary["quantity"]

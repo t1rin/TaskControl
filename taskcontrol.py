@@ -92,7 +92,7 @@ def _info_command(commands: list[str]) -> None:
         percent = len(current_subject.solved) / current_subject.quantity * 100
         num_quantity = {}
         tasks = current_subject.solved
-        decision_end = None if not tasks else tasks[-1][1]
+        decision_end = None if not tasks else tasks[-1][1] 
         for task in tasks:
             date_str = strftime("%d-%m-%y", localtime(task[1]))
             if date_str not in num_quantity.keys():
@@ -105,10 +105,10 @@ def _info_command(commands: list[str]) -> None:
             len(current_subject.solved),
             current_subject.quantity,
             round(percent, 1),
-            sum(num_quantity.values()) // len(num_quantity.values()),
-            max(num_quantity.values()),
+            sum(num_quantity.values()) // len(num_quantity.values()) if num_quantity else "0",
+            max(num_quantity.values()) if num_quantity else "0",
             strftime(TIME_FORMAT_D, localtime(decision_end)),
-            current_subject.time // 3600
+            round(current_subject.time / 3600, 1)
         ))
     else:
         try:
@@ -131,6 +131,20 @@ def _info_command(commands: list[str]) -> None:
                 raise ValueError
         except ValueError:
             show(ARGS_ERROR)
+
+
+def _rename_command(commands: list[str]) -> None:
+    if len(commands) > 2:
+        name = commands[2]
+        match commands[1]:
+            case "--file" | "-f":
+                current_subject.rename(name=name, is_public=True)
+            case "--code" | "-c":
+                current_subject.rename(name=name, is_public=False)
+            case _:
+                show(ARGS_ERROR)
+    else:
+        show(NOT_ARGS_ERROR)
 
 
 def _gogo_command() -> None:
@@ -195,6 +209,8 @@ def main() -> None:
                     _rand_command(commands)
                 case "info":
                     _info_command(commands)
+                case "rename":
+                    _rename_command(commands)
                 case "gogo":
                     _gogo_command()
                 case "exit":
