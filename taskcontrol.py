@@ -5,6 +5,7 @@ from config import *
 from time import strftime, localtime
 from threading import Thread
 from os.path import abspath
+import subprocess
 import os
 
 current_subject: Subject | None = None
@@ -128,7 +129,13 @@ def _gogo_command() -> None:
     def run_cmd(cmd: str, file_name: str) -> None:
         global is_running
         is_running = True
-        os.system(cmd + " " + file_name)
+        process = subprocess.Popen(
+            [cmd, file_name],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL
+        )
+        process.wait()
         is_running = False
 
     root_path = abspath(os.path.dirname(os.path.realpath(__file__)) + "/../") + "/"
