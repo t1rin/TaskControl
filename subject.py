@@ -8,14 +8,10 @@ from json.decoder import JSONDecodeError
 
 PATH = os.path.dirname(os.path.realpath(__file__)) + "/subjects"
 
-def check(func) -> None:
-    if not os.path.exists(PATH):
-        os.mkdir(PATH)
-    return func
 
-
-@check
 def subject_exist(name: str) -> bool:
+    if not os.path.isdir(PATH):
+        os.mkdir(PATH)
     keys = ["name", "quantity", "time", "favorite", "solved"]
     path = PATH + "/" + name
     try:
@@ -32,8 +28,9 @@ def subject_exist(name: str) -> bool:
     return True
 
 
-@check
 def subject_list() -> list[str]:
+    if not os.path.isdir(PATH):
+        os.mkdir(PATH)
     files = os.listdir(PATH)
     file_list = []
     for file in files:
