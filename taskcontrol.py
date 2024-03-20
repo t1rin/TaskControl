@@ -90,12 +90,25 @@ def _rand_command(commands: list[str]) -> None:
 def _info_command(commands: list[str]) -> None:
     if len(commands) < 2:
         percent = len(current_subject.solved) / current_subject.quantity * 100
+        num_quantity = {}
+        tasks = current_subject.solved
+        decision_end = None if not tasks else tasks[-1][1]
+        for task in tasks:
+            date_str = strftime("%d-%m-%y", localtime(task[1]))
+            if date_str not in num_quantity.keys():
+                num_quantity[date_str] = 1
+            else:
+                num_quantity[date_str] += 1
         show(INFO.format(
             current_subject.name,
             len(current_subject.favorite),
             len(current_subject.solved),
             current_subject.quantity,
-            round(percent, 1)
+            round(percent, 1),
+            sum(num_quantity.values()) // len(num_quantity.values()),
+            max(num_quantity.values()),
+            strftime(TIME_FORMAT_D, localtime(decision_end)),
+            current_subject.time // 3600
         ))
     else:
         try:

@@ -1,5 +1,6 @@
 from random import sample
-from time import time
+
+import time
 import json
 import os
 
@@ -15,7 +16,7 @@ def check(func) -> None:
 
 @check
 def subject_exist(name: str) -> bool:
-    keys = ["name", "quantity", "favorite", "solved"]
+    keys = ["name", "quantity", "time", "favorite", "solved"]
     path = PATH + "/" + name
     try:
         with open(path, "r", encoding="utf-8") as file:
@@ -26,8 +27,8 @@ def subject_exist(name: str) -> bool:
     except FileNotFoundError:
         return False
     except JSONDecodeError as error:
-        print(error)
-        exit(1)
+        # print(error)
+        return False
     return True
 
 
@@ -46,8 +47,11 @@ class Subject:
     def __init__(self, name) -> None:
         self.name: str = name
         self.quantity: int | None = None
+        self.time: int | None = None
         self.favorite: list[int] | None = None
         self.solved: list[list[int]] | None = None
+
+        self.timestamp = int(time.time())
 
         self._load_subject()
 
@@ -75,13 +79,16 @@ class Subject:
                 if self.solved \
                 else []
             if arg not in solved and 0 < arg <= self.quantity:
-                self.solved.append([arg, int(time())])
+                self.solved.append([arg, int(time.time())])
         self.update()
 
     def update(self) -> None:
+        self.time += int(time.time() - self.timestamp)
+        self.timestamp = int(time.time())
         dictionary = {
             "name": self.name,
             "quantity": self.quantity,
+            "time": self.time,
             "favorite": self.favorite,
             "solved": self.solved
         }
@@ -93,6 +100,7 @@ class Subject:
             dictionary = json.loads(file.read())
             self.name = dictionary["name"]
             self.quantity = dictionary["quantity"]
+            self.time = dictionary["time"]
             self.favorite = dictionary["favorite"]
             self.solved = dictionary["solved"]
 
@@ -101,6 +109,7 @@ def create_subject(name: str, number_of_tasks: int) -> None:
     dictionary = {
         "name": name,
         "quantity": number_of_tasks,
+        "time": 0,
         "favorite": [],
         "solved": []
     }
