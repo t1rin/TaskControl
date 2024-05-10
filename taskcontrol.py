@@ -184,8 +184,11 @@ class TaskControl():
             ))
         else:
             try:
-                number = int(self.commands[1])
-                if 0 < number <= self.current_subject.quantity:
+                if self.current_subject.numbering:
+                    number = int(self.commands[1])
+                else:
+                    number = self.commands[1]
+                if not self.current_subject.numbering or 0 < number <= self.current_subject.quantity:
                     time_n = None
                     found = False
                     for num, tm in self.current_subject.solved:

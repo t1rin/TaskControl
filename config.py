@@ -60,9 +60,9 @@ TIME_FORMAT_D = "%d-%m-%y %H:%M"
 
 TIME_FORMAT_F = "Задачи-%d-%m-%y"
 
-COMMAND = ""  # :)
+COMMAND = "xournalpp"  # :)
 
-TYPE = ""
+TYPE = ".xopp"
 
 INPUT_ERROR = "[warning]Команда не найдена.[/warning] help [warning]для получения дополнительной информации[/warning]"
 
