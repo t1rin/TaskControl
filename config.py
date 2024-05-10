@@ -23,7 +23,7 @@ LOCAL_HELP_TEXT = """
 """
 
 INFO = """
-[h5]Название предмета[/h5]: {}
+[h5]Название предмета[/h5]: [h3]{}[/h3]
 
 [h5]Задания[/h5]:
 - [h2]{}[/h2] в [italic]избранном[/italic]
@@ -58,9 +58,11 @@ TIME_FORMAT_D = "%d-%m-%y %H:%M"
 
 TIME_FORMAT_F = "Задачи-%d-%m-%y"
 
-COMMAND = ""  # :)
+COMMAND = "xournalpp"  # :)
 
-INPUT_ERROR = "[warning]Команда не найдена.[/warning] [cmd][i]help[/i][/cmd] [warning]для получения дополнительной информации[/warning]"
+TYPE = ".xopp"
+
+INPUT_ERROR = "[warning]Команда не найдена.[/warning] help [warning]для получения дополнительной информации[/warning]"
 
 ZERO_LIST_TEXT = "[warning]Вы ещё не создали ни одного предмета[/warning]"
 

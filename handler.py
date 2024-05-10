@@ -11,7 +11,7 @@ styles = {
     "h5": "bold",  # important words
     "cmd": "green",  # command
     "comment": "italic gray70",  # comments
-    "warning": "yellow"  # warning messages
+    "warning": "white"  # warning messages
 }
 
 
