@@ -12,7 +12,7 @@ PATH = os.path.dirname(os.path.realpath(__file__)) + "/subjects"
 def subject_exist(name: str) -> bool:
     if not os.path.isdir(PATH):
         os.mkdir(PATH)
-    keys = ["name", "quantity", "time", "favorite", "solved"]
+    keys = ["name", "quantity", "time", "numbering", "favorite", "solved"]
     path = PATH + "/" + name
     try:
         with open(path, "r", encoding="utf-8") as file:
@@ -46,6 +46,7 @@ class Subject:
         self.name: str | None = None
         self.quantity: int | None = None
         self.time: int | None = None
+        self.numbering: bool | None = None
         self.favorite: list[int] | None = None
         self.solved: list[list[int]] | None = None
 
@@ -53,7 +54,9 @@ class Subject:
 
         self._load_subject()
 
-    def rand_tasks(self, quantity: int) -> list[int]:
+    def rand_tasks(self, quantity: int) -> list[int] | None:
+        if not self.numbering:
+            return
         all_tasks = {i + 1 for i in range(self.quantity)}
         if self.solved:
             solved = list(zip(*self.solved))[0]
@@ -72,7 +75,8 @@ class Subject:
     def add_to_fav(self, *args) -> None:
         self.favorite.extend(args)
         self.favorite = list(set(self.favorite))
-        self.favorite = [n for n in self.favorite if n <= self.quantity]
+        if self.numbering:
+            self.favorite = [n for n in self.favorite if n <= self.quantity]
         self.update()
 
     def del_fav(self, *args) -> None:
@@ -84,17 +88,20 @@ class Subject:
             solved = list(zip(*self.solved))[0] \
                 if self.solved \
                 else []
-            if arg not in solved and 0 < arg <= self.quantity:
+            if arg not in solved and (not self.numbering or 0 < arg <= self.quantity):
                 self.solved.append([arg, int(time.time())])
         self.update()
 
     def update(self) -> None:
         self.time += int(time.time() - self.timestamp)
         self.timestamp = int(time.time())
+        if not self.numbering:
+            self.quantity = len(self.solved)
         dictionary = {
             "name": self.name,
             "quantity": self.quantity,
             "time": self.time,
+            "numbering": self.numbering,
             "favorite": self.favorite,
             "solved": self.solved
         }
@@ -107,15 +114,17 @@ class Subject:
             self.name = dictionary["name"]
             self.quantity = dictionary["quantity"]
             self.time = dictionary["time"]
+            self.numbering = dictionary["numbering"]
             self.favorite = dictionary["favorite"]
             self.solved = dictionary["solved"]
 
 
-def create_subject(name: str, number_of_tasks: int) -> None:
+def create_subject(name: str, number_of_tasks: int = 0) -> None:
     dictionary = {
         "name": name,
         "quantity": number_of_tasks,
         "time": 0,
+        "numbering": bool(number_of_tasks),
         "favorite": [],
         "solved": []
     }

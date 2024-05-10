@@ -72,8 +72,13 @@ class TaskControl():
 
 
     def _create_command(self) -> None:
-        if len(self.commands) < 3:
+        if len(self.commands) < 2:
             show(NOT_ARGS_ERROR)
+        elif len(self.commands) == 2:
+            if not subject_exist(self.commands[1]):
+                create_subject(self.commands[1])
+            else:
+                show(ITEM_EXIST_ERROR)
         else:
             if not subject_exist(self.commands[1]):
                 try:
@@ -101,7 +106,10 @@ class TaskControl():
     def _fav_command(self) -> None:
         if len(self.commands) > 1:
             try:
-                self.current_subject.add_to_fav(*map(int, self.commands[1:]))
+                if self.current_subject.numbering:
+                    self.current_subject.add_to_fav(*map(int, self.commands[1:]))
+                else:
+                    self.current_subject.add_to_fav(self.commands[1:])
             except ValueError:
                 show(ARGS_ERROR)
         else:
@@ -110,7 +118,10 @@ class TaskControl():
 
     def _del_fav_command(self) -> None:
         try:
-            self.current_subject.del_fav(*map(int, self.commands[1:]))
+            if self.current_subject.numbering:
+                self.current_subject.del_fav(*map(int, self.commands[1:]))
+            else:
+                self.current_subject.del_fav(self.commands[1:])
         except ValueError:
             show(ARGS_ERROR)
 
@@ -118,7 +129,10 @@ class TaskControl():
     def _done_command(self) -> None:
         if len(self.commands) > 1:
             try:
-                self.current_subject.add_to_done(*map(int, self.commands[1:]))
+                if self.current_subject.numbering:
+                    self.current_subject.add_to_done(*map(int, self.commands[1:]))
+                else:
+                    self.current_subject.add_to_done(*self.commands[1:])
             except ValueError:
                 show(ARGS_ERROR)
         else:
@@ -133,14 +147,20 @@ class TaskControl():
         else:
             try:
                 quantity = int(self.commands[1])
-                show(*map(str, self.current_subject.rand_tasks(quantity)), sep=SEPARATOR)
+                randint = self.current_subject.rand_tasks(quantity)
+                if not randint:
+                    show(NOT_NUMBERING_WARNING)
+                    return
+                show(*map(str, randint), sep=SEPARATOR)
             except ValueError:
                 show(ARGS_ERROR)
 
 
     def _info_command(self) -> None:
         if len(self.commands) < 2:
-            percent = len(self.current_subject.solved) / self.current_subject.quantity * 100
+            percent = len(self.current_subject.solved) / self.current_subject.quantity * 100 \
+                if self.current_subject.quantity \
+                else 100
             num_quantity = {}
             tasks = self.current_subject.solved
             decision_end = None if not tasks else tasks[-1][1] 
@@ -152,6 +172,7 @@ class TaskControl():
                     num_quantity[date_str] += 1
             show(INFO.format(
                 self.current_subject.name,
+                YES if self.current_subject.numbering else NO,
                 len(self.current_subject.favorite),
                 len(self.current_subject.solved),
                 self.current_subject.quantity,
@@ -188,9 +209,9 @@ class TaskControl():
         if len(self.commands) > 2:
             name = " ".join(self.commands[2:])
             match self.commands[1]:
-                case "--file" | "-f":
+                case "--name" | "-n":
                     self.current_subject.rename(name=name, is_public=True)
-                case "--code" | "-c":
+                case "--file" | "-f":
                     self.current_subject.rename(name=name, is_public=False)
                 case _:
                     show(ARGS_ERROR)
