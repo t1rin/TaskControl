@@ -4,3 +4,4 @@ venv
 idea
 __pycache__
 NODE.md
+activate.sh
