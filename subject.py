@@ -57,15 +57,21 @@ class Subject:
     def rand_tasks(self, quantity: int, num1: int | None = None, num2: int | None = None) -> list[int] | None:
         if not self.numbering:
             return
-        if not (num1 and num2):
+        if not num1:
             num1 = 1
+        if not num2:
             num2 = self.quantity
         all_tasks = {i + 1 for i in range(self.quantity) if num1 <= i + 1 <= num2}
         if self.solved:
             solved = list(zip(*self.solved))[0]
         else:
             solved = []
-        return sample(list(all_tasks - set(solved)), quantity)
+        unresolved = all_tasks - set(solved)
+        if len(unresolved) == 0:
+            return []
+        if len(unresolved) < quantity:
+            quantity = len(unresolved)
+        return sample(list(unresolved), quantity)
 
     def rename(self, name: str, is_public: bool) -> None:
         if is_public:

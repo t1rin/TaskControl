@@ -142,24 +142,30 @@ class TaskControl():
 
 
     def _rand_command(self) -> None:
-        if len(self.commands) < 2:
-            show(NOT_ARGS_ERROR)
-        else:
-            try:
-                commands = self.commands[1:]
-                num1 = num2 = None
-                for cmd in commands:
-                    if ".." in cmd:
-                        num1, num2 = map(int, set(cmd.split("..")))
-                    else:
-                        quantity = int(cmd)
-                randint = self.current_subject.rand_tasks(quantity, num1, num2)
-                if not randint:
-                    show(NOT_NUMBERING_WARNING)
-                    return
+        try:
+            commands = self.commands[1:]
+            num1 = num2 = None
+            quantity = 1
+            for cmd in commands:
+                if ".." in cmd:
+                    nums = cmd.split("..")
+                    if len(nums[0]) != 0:
+                        num1 = int(nums[0])
+                    if len(nums[1]) != 0:
+                        num2 = int(nums[1])
+                else:
+                    quantity = int(cmd)
+            if num1 > num2:
+                raise ValueError
+            randint = self.current_subject.rand_tasks(quantity, num1, num2)
+            if randint is None:
+                show(NOT_NUMBERING_WARNING)
+            elif not randint:
+                show(TASKS_SOLVED_MESSAGE)
+            else:
                 show(*map(str, randint), sep=SEPARATOR)
-            except ValueError:
-                show(ARGS_ERROR)
+        except ValueError:
+            show(ARGS_ERROR)
 
 
     def _info_command(self) -> None:
