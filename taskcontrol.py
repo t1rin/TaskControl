@@ -136,7 +136,7 @@ class TaskControl():
             except ValueError:
                 show(ARGS_ERROR)
         else:
-            for number in self.current_subject.solved:
+            for number in self.current_subject.solved[-QUANTITY_OUTPUT_DONE_CMD:]:
                 tm = strftime(TIME_FORMAT_D, localtime(number[1]))
                 show(f"[{tm}]{SEPARATOR}{number[0]}")
 
@@ -197,25 +197,27 @@ class TaskControl():
         else:
             try:
                 if self.current_subject.numbering:
-                    number = int(self.commands[1])
+                    numbers = list(map(int, self.commands[1:]))
+                    print(numbers)
                 else:
-                    number = self.commands[1]
-                if not self.current_subject.numbering or 0 < number <= self.current_subject.quantity:
-                    time_n = None
-                    found = False
-                    for num, tm in self.current_subject.solved:
-                        if num == number:
-                            found = True
-                            time_n = tm
-                            break
-                    show(INFO_TASK.format(
-                        number,
-                        YES if found else NO,
-                        YES if number in self.current_subject.favorite else NO,
-                        NO if not found else strftime(TIME_FORMAT_D, localtime(time_n))
-                    ))
-                else:
-                    raise ValueError
+                    numbers = self.commands[1:]
+                for number in numbers:
+                    if not self.current_subject.numbering or 0 < number <= self.current_subject.quantity:
+                        time_n = None
+                        found = False
+                        for num, tm in self.current_subject.solved:
+                            if num == number:
+                                found = True
+                                time_n = tm
+                                break
+                        show(INFO_TASK.format(
+                            number,
+                            YES if found else NO,
+                            YES if number in self.current_subject.favorite else NO,
+                            NO if not found else strftime(TIME_FORMAT_D, localtime(time_n))
+                        ))
+                    else:
+                        raise ValueError
             except ValueError:
                 show(ARGS_ERROR)
 
