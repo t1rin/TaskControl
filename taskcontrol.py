@@ -60,6 +60,8 @@ class TaskControl():
                     case "gogo":
                         self._gogo_command()
                     case "exit":
+                        if "~~" in self.commands[1:]:
+                            exit(0)
                         self.current_subject = None
                     case _:
                         show(INPUT_ERROR)
@@ -155,7 +157,7 @@ class TaskControl():
                         num2 = int(nums[1])
                 else:
                     quantity = int(cmd)
-            if num1 > num2:
+            if num1 and num2 and num1 > num2:
                 raise ValueError
             randint = self.current_subject.rand_tasks(quantity, num1, num2)
             if randint is None:
