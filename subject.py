@@ -54,10 +54,13 @@ class Subject:
 
         self._load_subject()
 
-    def rand_tasks(self, quantity: int) -> list[int] | None:
+    def rand_tasks(self, quantity: int, num1: int | None = None, num2: int | None = None) -> list[int] | None:
         if not self.numbering:
             return
-        all_tasks = {i + 1 for i in range(self.quantity)}
+        if not (num1 and num2):
+            num1 = 1
+            num2 = self.quantity
+        all_tasks = {i + 1 for i in range(self.quantity) if num1 <= i + 1 <= num2}
         if self.solved:
             solved = list(zip(*self.solved))[0]
         else:

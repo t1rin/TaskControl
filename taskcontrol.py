@@ -146,8 +146,14 @@ class TaskControl():
             show(NOT_ARGS_ERROR)
         else:
             try:
-                quantity = int(self.commands[1])
-                randint = self.current_subject.rand_tasks(quantity)
+                commands = self.commands[1:]
+                num1 = num2 = None
+                for cmd in commands:
+                    if ".." in cmd:
+                        num1, num2 = map(int, set(cmd.split("..")))
+                    else:
+                        quantity = int(cmd)
+                randint = self.current_subject.rand_tasks(quantity, num1, num2)
                 if not randint:
                     show(NOT_NUMBERING_WARNING)
                     return
