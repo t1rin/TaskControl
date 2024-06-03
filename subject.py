@@ -3,6 +3,7 @@ from random import sample
 import time
 import json
 import os
+import re
 
 from json.decoder import JSONDecodeError
 
@@ -48,7 +49,7 @@ class Subject:
         self.time: int | None = None
         self.numbering: bool | None = None
         self.favorite: list[int] | None = None
-        self.solved: list[list[int]] | None = None
+        self.solved: list[list[int|str]] | None = None
 
         self.timestamp = int(time.time())
 
@@ -56,7 +57,43 @@ class Subject:
 
     def rand_tasks(self, quantity: int, num1: int | None = None, num2: int | None = None) -> list[int] | None:
         if not self.numbering:
-            return
+            try:
+                unresolved = set()
+                k = None
+                for task, _ in self.solved:
+                    nums = list(map(int, re.findall(r"\d+", task)))
+                    if not k:
+                        k = len(nums)
+                    else:
+                        if k != len(nums):
+                            print("(ValueError) task: " + task)
+                            raise ValueError
+                    unresolved = unresolved.union([(*nums[:k-1], x) for x in range(1, nums[-1])])
+
+                    args = nums[:-1]
+                    def recurse(index, current_combination):
+                        if index == len(args):
+                            unresolved.add((*set(current_combination.copy()), 0))
+                            return
+
+                        for value in range(1, args[index]):
+                            current_combination[index] = value
+                            recurse(index + 1, current_combination)
+                        current_combination[index] = 1
+                    recurse(0, [1] * len(args))
+
+                    if set(nums) in unresolved:
+                        unresolved.remove(set(nums))
+                if len(unresolved) == 0:
+                    return []
+                if len(unresolved) < quantity:
+                    quantity = len(unresolved)
+                for task in unresolved:
+                    if task[-1] != 0 and (tsk := (*task[:-1], 0)) in unresolved:
+                        unresolved.remove(tsk)
+                return [".".join(list(map(str, task))) for task in sample(list(unresolved), quantity)]
+            except:
+                return
         if not num1:
             num1 = 1
         if not num2:
